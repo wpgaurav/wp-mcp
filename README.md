@@ -16,7 +16,20 @@ A TypeScript MCP server that exposes any WordPress site's REST API as MCP tools.
 - A WordPress site with REST API enabled
 - An [Application Password](https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/) for authentication
 
-## Installation
+## Quick Start
+
+```bash
+npx @wpgaurav/wp-mcp setup
+```
+
+This interactive wizard will:
+1. Ask for your WordPress URL, username, and Application Password
+2. Test the connection
+3. Write the config to Claude Desktop and/or Claude Code automatically
+
+That's it. Restart Claude and your WordPress tools are ready.
+
+## Manual Installation
 
 ```bash
 # Run directly with npx

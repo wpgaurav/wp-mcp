@@ -4,9 +4,16 @@ import { loadConfig } from "../src/config.js";
 import { createWpMcpServer } from "../src/server.js";
 import { createStdioTransport } from "../src/transports/stdio.js";
 import { startHttpTransport } from "../src/transports/http.js";
+import { runSetup } from "../src/setup.js";
 
 async function main() {
   const args = process.argv.slice(2);
+
+  if (args[0] === "setup") {
+    await runSetup();
+    return;
+  }
+
   const overrides: Record<string, string> = {};
 
   for (let i = 0; i < args.length; i++) {

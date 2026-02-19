@@ -20,10 +20,10 @@ A TypeScript MCP server that exposes any WordPress site's REST API as MCP tools.
 
 ```bash
 # Run directly with npx
-npx wp-mcp
+npx @wpgaurav/wp-mcp
 
 # Or install globally
-npm install -g wp-mcp
+npm install -g @wpgaurav/wp-mcp
 ```
 
 ## Configuration
@@ -49,7 +49,7 @@ Add to your `claude_desktop_config.json`:
   "mcpServers": {
     "wordpress": {
       "command": "npx",
-      "args": ["wp-mcp"],
+      "args": ["@wpgaurav/wp-mcp"],
       "env": {
         "WP_URL": "https://example.com",
         "WP_USERNAME": "admin",
@@ -67,7 +67,7 @@ Add to your `claude_desktop_config.json`:
   "mcpServers": {
     "wordpress": {
       "command": "npx",
-      "args": ["wp-mcp"],
+      "args": ["@wpgaurav/wp-mcp"],
       "env": {
         "WP_URL": "https://example.com",
         "WP_USERNAME": "admin",
@@ -85,7 +85,7 @@ WP_URL=https://example.com \
 WP_USERNAME=admin \
 WP_APP_PASSWORD="xxxx xxxx xxxx xxxx" \
 WP_MCP_TRANSPORT=http \
-npx wp-mcp
+npx @wpgaurav/wp-mcp
 ```
 
 The server listens on `http://127.0.0.1:3000/mcp` with StreamableHTTP.
@@ -199,7 +199,7 @@ npm run build
 ## Library Usage
 
 ```typescript
-import { createWpMcpServer, loadConfig } from "wp-mcp";
+import { createWpMcpServer, loadConfig } from "@wpgaurav/wp-mcp";
 
 const config = loadConfig({
   wpUrl: "https://example.com",

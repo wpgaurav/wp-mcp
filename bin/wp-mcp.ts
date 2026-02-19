@@ -6,8 +6,43 @@ import { createStdioTransport } from "../src/transports/stdio.js";
 import { startHttpTransport } from "../src/transports/http.js";
 import { runSetup } from "../src/setup.js";
 
+function printHelp(): void {
+  console.log(`
+wp-mcp — WordPress MCP Server
+
+Usage:
+  npx @wpgaurav/wp-mcp                Start the server (stdio transport)
+  npx @wpgaurav/wp-mcp setup          Interactive setup wizard
+  npx @wpgaurav/wp-mcp --help         Show this help
+
+Options:
+  --transport <stdio|http>   Transport type (default: stdio)
+  --port <number>            HTTP port (default: 3000)
+  --host <address>           HTTP bind address (default: 127.0.0.1)
+  --no-discover              Disable auto-discovery of plugin endpoints
+
+Environment variables:
+  WP_URL              WordPress site URL (required)
+  WP_USERNAME         WordPress username (required)
+  WP_APP_PASSWORD     Application Password (required)
+  WP_MCP_TRANSPORT    stdio or http (default: stdio)
+  WP_MCP_PORT         HTTP port (default: 3000)
+  WP_MCP_HOST         HTTP bind address (default: 127.0.0.1)
+  WP_MCP_DISCOVER     Auto-discover plugin endpoints (default: true)
+  WP_MCP_MAX_TOOLS    Max total tools, core + discovered (default: 128)
+
+Quick start:
+  npx @wpgaurav/wp-mcp setup
+`);
+}
+
 async function main() {
   const args = process.argv.slice(2);
+
+  if (args.includes("--help") || args.includes("-h")) {
+    printHelp();
+    return;
+  }
 
   if (args[0] === "setup") {
     await runSetup();

@@ -1,7 +1,27 @@
-const SKIP_NAMESPACES = new Set(["wp/v2", "oembed/1.0"]);
+const SKIP_NAMESPACES = new Set([
+  "wp/v2",
+  "oembed/1.0",
+  "wp-site-health/v1",
+  "wp-block-editor/v1",
+  "wp/v2/block-renderer",
+]);
+
+const SKIP_NAMESPACE_PREFIXES = [
+  "wp/v2",
+  "oembed",
+  "wp-site-health",
+  "wp-block-editor",
+];
+
+const DISCOVERY_METHODS = new Set(["GET", "POST"]);
 
 export function shouldSkipNamespace(namespace: string): boolean {
-  return SKIP_NAMESPACES.has(namespace);
+  if (SKIP_NAMESPACES.has(namespace)) return true;
+  return SKIP_NAMESPACE_PREFIXES.some((p) => namespace.startsWith(p));
+}
+
+export function shouldDiscoverMethod(method: string): boolean {
+  return DISCOVERY_METHODS.has(method.toUpperCase());
 }
 
 export function routeToToolName(

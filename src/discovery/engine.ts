@@ -3,9 +3,11 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { WpClient } from "../client/wp-client.js";
 import type { ToolRegistry } from "../tools/registry.js";
 import { handleWpError, jsonResult } from "../tools/shared.js";
-import { shouldSkipNamespace } from "./naming.js";
+import { shouldSkipNamespace, shouldDiscoverMethod } from "./naming.js";
 import { registerDiscoveredTool, type DiscoveredRoute } from "./tool-generator.js";
 import type { WpArgDefinition } from "./schema-mapper.js";
+
+const DEFAULT_MAX_DISCOVERED = 128;
 
 interface WpRouteEndpoint {
   methods: string[];
@@ -25,18 +27,25 @@ export async function runDiscovery(
   server: McpServer,
   client: WpClient,
   registry: ToolRegistry,
+  maxTools: number = DEFAULT_MAX_DISCOVERED,
 ): Promise<number> {
   const discovery = await client.fetchRawJson<WpDiscoveryResponse>("/");
   const routes = discovery.routes ?? {};
+  const coreCount = registry.size();
+  const cap = Math.max(0, maxTools - coreCount);
   let count = 0;
 
   for (const [routePath, routeInfo] of Object.entries(routes)) {
+    if (count >= cap) break;
+
     const namespace = routeInfo.namespace ?? inferNamespace(routePath);
     if (!namespace || shouldSkipNamespace(namespace)) continue;
 
     const endpoints = routeInfo.endpoints ?? [];
     if (endpoints.length === 0 && routeInfo.methods) {
       for (const method of routeInfo.methods) {
+        if (count >= cap) break;
+        if (!shouldDiscoverMethod(method)) continue;
         const discovered: DiscoveredRoute = {
           namespace,
           path: stripNamespaceFromPath(routePath, namespace),
@@ -51,7 +60,10 @@ export async function runDiscovery(
     }
 
     for (const endpoint of endpoints) {
+      if (count >= cap) break;
       for (const method of endpoint.methods) {
+        if (count >= cap) break;
+        if (!shouldDiscoverMethod(method)) continue;
         const discovered: DiscoveredRoute = {
           namespace,
           path: stripNamespaceFromPath(routePath, namespace),
@@ -67,7 +79,12 @@ export async function runDiscovery(
 
   registerDiscoverRoutesTool(server, client, registry);
 
-  console.error(`Auto-discovery: registered ${count} tools from custom endpoints`);
+  const total = coreCount + count;
+  if (count >= cap) {
+    console.error(`Auto-discovery: registered ${count} tools (capped at ${maxTools} total). Use wp_discover_routes to scan specific namespaces.`);
+  } else {
+    console.error(`Auto-discovery: registered ${count} tools (${total} total)`);
+  }
   return count;
 }
 

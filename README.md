@@ -52,6 +52,7 @@ Set environment variables:
 | `WP_MCP_PORT` | No | `3000` | HTTP transport port |
 | `WP_MCP_HOST` | No | `127.0.0.1` | HTTP transport bind address |
 | `WP_MCP_DISCOVER` | No | `true` | Auto-discover custom endpoints |
+| `WP_MCP_MAX_TOOLS` | No | `128` | Maximum total tools (core + discovered) |
 
 ### Claude Desktop
 

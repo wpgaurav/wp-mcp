@@ -24,7 +24,7 @@ export async function createWpMcpServer(config: WpMcpConfig): Promise<WpMcpServe
 
   if (config.discover) {
     try {
-      await runDiscovery(server, client, registry);
+      await runDiscovery(server, client, registry, config.maxTools);
     } catch (err) {
       console.error("Auto-discovery failed (non-fatal):", (err as Error).message);
     }

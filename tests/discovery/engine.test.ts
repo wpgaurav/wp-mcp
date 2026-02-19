@@ -45,8 +45,8 @@ describe("discovery engine", () => {
     expect(registry.has("wc_products_list")).toBe(true);
     expect(registry.has("wc_products_get")).toBe(true);
     expect(registry.has("wc_products_create")).toBe(true);
-    expect(registry.has("wc_products_update")).toBe(true);
-    expect(registry.has("wc_products_delete")).toBe(true);
+    expect(registry.has("wc_products_update")).toBe(false);
+    expect(registry.has("wc_products_delete")).toBe(false);
   });
 
   it("discovers WooCommerce order tools", async () => {
@@ -56,8 +56,8 @@ describe("discovery engine", () => {
     expect(registry.has("wc_orders_list")).toBe(true);
     expect(registry.has("wc_orders_get")).toBe(true);
     expect(registry.has("wc_orders_create")).toBe(true);
-    expect(registry.has("wc_orders_update")).toBe(true);
-    expect(registry.has("wc_orders_delete")).toBe(true);
+    expect(registry.has("wc_orders_update")).toBe(false);
+    expect(registry.has("wc_orders_delete")).toBe(false);
   });
 
   it("discovers nested order notes tools", async () => {
@@ -73,7 +73,7 @@ describe("discovery engine", () => {
     await runDiscovery(server, client, registry);
 
     expect(registry.has("acf_posts_get")).toBe(true);
-    expect(registry.has("acf_posts_update")).toBe(true);
+    expect(registry.has("acf_posts_update")).toBe(false);
   });
 
   it("discovers Yoast tools", async () => {

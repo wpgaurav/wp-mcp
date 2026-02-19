@@ -12,4 +12,8 @@ export class ToolRegistry {
   all(): string[] {
     return [...this.registered];
   }
+
+  size(): number {
+    return this.registered.size;
+  }
 }

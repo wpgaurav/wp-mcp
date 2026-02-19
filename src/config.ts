@@ -6,6 +6,7 @@ export interface WpMcpConfig {
   port: number;
   host: string;
   discover: boolean;
+  maxTools: number;
 }
 
 export function loadConfig(overrides: Partial<WpMcpConfig> = {}): WpMcpConfig {
@@ -18,6 +19,7 @@ export function loadConfig(overrides: Partial<WpMcpConfig> = {}): WpMcpConfig {
     port: overrides.port ?? parseInt(process.env["WP_MCP_PORT"] ?? "3000", 10),
     host: overrides.host ?? process.env["WP_MCP_HOST"] ?? "127.0.0.1",
     discover: overrides.discover ?? (process.env["WP_MCP_DISCOVER"] !== "false"),
+    maxTools: overrides.maxTools ?? parseInt(process.env["WP_MCP_MAX_TOOLS"] ?? "128", 10),
   };
 
   config.wpUrl = config.wpUrl.replace(/\/+$/, "");

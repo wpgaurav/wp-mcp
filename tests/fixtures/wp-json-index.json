@@ -1,0 +1,158 @@
+{
+  "name": "Test WordPress Site",
+  "description": "Just another WordPress site",
+  "url": "https://example.com",
+  "home": "https://example.com",
+  "gmt_offset": "0",
+  "timezone_string": "UTC",
+  "namespaces": [
+    "wp/v2",
+    "oembed/1.0",
+    "wc/v3",
+    "acf/v1",
+    "yoast/v1",
+    "wp-site-health/v1"
+  ],
+  "routes": {
+    "/wp/v2": {
+      "namespace": "wp/v2",
+      "methods": ["GET"],
+      "endpoints": [{ "methods": ["GET"], "args": {} }]
+    },
+    "/wp/v2/posts": {
+      "namespace": "wp/v2",
+      "methods": ["GET", "POST"],
+      "endpoints": [
+        {
+          "methods": ["GET"],
+          "args": {
+            "page": { "type": "integer", "default": 1, "minimum": 1, "required": false, "description": "Current page of the collection." },
+            "per_page": { "type": "integer", "default": 10, "minimum": 1, "maximum": 100, "required": false, "description": "Maximum number of items to be returned in result set." },
+            "search": { "type": "string", "required": false, "description": "Limit results to those matching a string." }
+          }
+        },
+        {
+          "methods": ["POST"],
+          "args": {
+            "title": { "type": "object", "required": false },
+            "content": { "type": "object", "required": false },
+            "status": { "type": "string", "enum": ["publish", "future", "draft", "pending", "private"], "required": false }
+          }
+        }
+      ]
+    },
+    "/wp/v2/posts/(?P<id>[\\d]+)": {
+      "namespace": "wp/v2",
+      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      "endpoints": [
+        { "methods": ["GET"], "args": { "id": { "type": "integer", "required": true } } },
+        { "methods": ["POST", "PUT", "PATCH"], "args": { "id": { "type": "integer", "required": true }, "title": { "type": "object" } } },
+        { "methods": ["DELETE"], "args": { "id": { "type": "integer", "required": true }, "force": { "type": "boolean", "default": false } } }
+      ]
+    },
+    "/wc/v3/products": {
+      "namespace": "wc/v3",
+      "methods": ["GET", "POST"],
+      "endpoints": [
+        {
+          "methods": ["GET"],
+          "args": {
+            "page": { "type": "integer", "default": 1, "minimum": 1, "required": false, "description": "Current page of the collection." },
+            "per_page": { "type": "integer", "default": 10, "minimum": 1, "maximum": 100, "required": false, "description": "Maximum number of items to be returned in result set." },
+            "search": { "type": "string", "required": false, "description": "Limit results to those matching a string." },
+            "status": { "type": "string", "enum": ["draft", "pending", "private", "publish", "any"], "required": false, "description": "Limit result set to products assigned a specific status." },
+            "category": { "type": "string", "required": false, "description": "Limit result set to products assigned a specific category ID." },
+            "type": { "type": "string", "enum": ["simple", "grouped", "external", "variable"], "required": false, "description": "Limit result set to products assigned a specific type." }
+          }
+        },
+        {
+          "methods": ["POST"],
+          "args": {
+            "name": { "type": "string", "required": true, "description": "Product name." },
+            "type": { "type": "string", "enum": ["simple", "grouped", "external", "variable"], "default": "simple", "required": false },
+            "regular_price": { "type": "string", "required": false, "description": "Product regular price." },
+            "description": { "type": "string", "required": false, "description": "Product description." },
+            "categories": { "type": "array", "items": { "type": "object" }, "required": false }
+          }
+        }
+      ]
+    },
+    "/wc/v3/products/(?P<id>[\\d]+)": {
+      "namespace": "wc/v3",
+      "methods": ["GET", "PUT", "PATCH", "DELETE"],
+      "endpoints": [
+        { "methods": ["GET"], "args": { "id": { "type": "integer", "required": true, "description": "Unique identifier for the resource." } } },
+        { "methods": ["PUT", "PATCH"], "args": { "id": { "type": "integer", "required": true }, "name": { "type": "string" }, "regular_price": { "type": "string" } } },
+        { "methods": ["DELETE"], "args": { "id": { "type": "integer", "required": true }, "force": { "type": "boolean", "default": false } } }
+      ]
+    },
+    "/wc/v3/orders": {
+      "namespace": "wc/v3",
+      "methods": ["GET", "POST"],
+      "endpoints": [
+        {
+          "methods": ["GET"],
+          "args": {
+            "page": { "type": "integer", "default": 1, "minimum": 1, "required": false },
+            "per_page": { "type": "integer", "default": 10, "minimum": 1, "maximum": 100, "required": false },
+            "status": { "type": "string", "enum": ["pending", "processing", "on-hold", "completed", "cancelled", "refunded", "failed", "trash", "any"], "required": false }
+          }
+        },
+        {
+          "methods": ["POST"],
+          "args": {
+            "status": { "type": "string", "enum": ["pending", "processing", "on-hold", "completed", "cancelled", "refunded", "failed"], "required": false },
+            "billing": { "type": "object", "required": false },
+            "line_items": { "type": "array", "items": { "type": "object" }, "required": false }
+          }
+        }
+      ]
+    },
+    "/wc/v3/orders/(?P<id>[\\d]+)": {
+      "namespace": "wc/v3",
+      "methods": ["GET", "PUT", "PATCH", "DELETE"],
+      "endpoints": [
+        { "methods": ["GET"], "args": { "id": { "type": "integer", "required": true } } },
+        { "methods": ["PUT", "PATCH"], "args": { "id": { "type": "integer", "required": true }, "status": { "type": "string" } } },
+        { "methods": ["DELETE"], "args": { "id": { "type": "integer", "required": true }, "force": { "type": "boolean", "default": false } } }
+      ]
+    },
+    "/wc/v3/orders/(?P<order_id>[\\d]+)/notes": {
+      "namespace": "wc/v3",
+      "methods": ["GET", "POST"],
+      "endpoints": [
+        { "methods": ["GET"], "args": { "order_id": { "type": "integer", "required": true } } },
+        { "methods": ["POST"], "args": { "order_id": { "type": "integer", "required": true }, "note": { "type": "string", "required": true } } }
+      ]
+    },
+    "/acf/v1/posts/(?P<id>[\\d]+)": {
+      "namespace": "acf/v1",
+      "methods": ["GET", "PUT", "PATCH"],
+      "endpoints": [
+        { "methods": ["GET"], "args": { "id": { "type": "integer", "required": true } } },
+        { "methods": ["PUT", "PATCH"], "args": { "id": { "type": "integer", "required": true }, "fields": { "type": "object", "required": false } } }
+      ]
+    },
+    "/yoast/v1/indexables": {
+      "namespace": "yoast/v1",
+      "methods": ["GET"],
+      "endpoints": [
+        {
+          "methods": ["GET"],
+          "args": {
+            "per_page": { "type": "integer", "default": 10, "required": false },
+            "type": { "type": "string", "required": false }
+          }
+        }
+      ]
+    },
+    "/custom-plugin/v1/settings": {
+      "namespace": "custom-plugin/v1",
+      "methods": ["GET", "POST"],
+      "endpoints": [
+        { "methods": ["GET"], "args": {} },
+        { "methods": ["POST"], "args": { "option_name": { "type": "string", "required": true }, "option_value": { "type": "string,integer", "required": true, "description": "The value can be a string or integer." } } }
+      ]
+    }
+  }
+}

@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "date": "2024-01-15T10:00:00",
+    "slug": "hello-world",
+    "status": "publish",
+    "type": "post",
+    "title": { "rendered": "Hello World" },
+    "content": { "rendered": "<p>Welcome to WordPress.</p>" },
+    "excerpt": { "rendered": "<p>Welcome to WordPress.</p>" },
+    "author": 1,
+    "categories": [1],
+    "tags": []
+  },
+  {
+    "id": 2,
+    "date": "2024-01-20T14:30:00",
+    "slug": "second-post",
+    "status": "publish",
+    "type": "post",
+    "title": { "rendered": "Second Post" },
+    "content": { "rendered": "<p>This is the second post.</p>" },
+    "excerpt": { "rendered": "<p>This is the second post.</p>" },
+    "author": 1,
+    "categories": [1, 2],
+    "tags": [1]
+  }
+]

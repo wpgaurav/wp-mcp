@@ -10,6 +10,7 @@ interface SetupAnswers {
   wpUrl: string;
   wpUsername: string;
   wpAppPassword: string;
+  maxTools: string;
 }
 
 function createPrompt(): (question: string) => Promise<string> {
@@ -76,14 +77,18 @@ function writeToConfig(configPath: string, answers: SetupAnswers): boolean {
   }
 
   const mcpServers = (config["mcpServers"] ?? {}) as Record<string, unknown>;
+  const env: Record<string, string> = {
+    WP_URL: answers.wpUrl,
+    WP_USERNAME: answers.wpUsername,
+    WP_APP_PASSWORD: answers.wpAppPassword,
+  };
+  if (answers.maxTools && answers.maxTools !== "128") {
+    env["WP_MCP_MAX_TOOLS"] = answers.maxTools;
+  }
   mcpServers["wordpress"] = {
     command: "npx",
     args: [PACKAGE_NAME],
-    env: {
-      WP_URL: answers.wpUrl,
-      WP_USERNAME: answers.wpUsername,
-      WP_APP_PASSWORD: answers.wpAppPassword,
-    },
+    env,
   };
   config["mcpServers"] = mcpServers;
 
@@ -140,7 +145,18 @@ Prerequisites:
     }
   }
 
-  const answers: SetupAnswers = { wpUrl: cleanUrl, wpUsername, wpAppPassword };
+  console.log(`
+Max tools controls how many tools are exposed to Claude.
+More tools = more context used per message.
+
+  37  = Core WordPress tools only (recommended for most sites)
+  50  = Core + a few plugin endpoints
+  128 = Core + all discovered plugin endpoints (default, uses most context)
+`);
+
+  const maxTools = await ask(prompt, "Max tools", "50");
+
+  const answers: SetupAnswers = { wpUrl: cleanUrl, wpUsername, wpAppPassword, maxTools };
 
   console.log(`
 Where do you want to use wp-mcp?
@@ -166,16 +182,20 @@ Where do you want to use wp-mcp?
   }
 
   if (target === "4") {
+    const printEnv: Record<string, string> = {
+      WP_URL: answers.wpUrl,
+      WP_USERNAME: answers.wpUsername,
+      WP_APP_PASSWORD: answers.wpAppPassword,
+    };
+    if (answers.maxTools && answers.maxTools !== "128") {
+      printEnv["WP_MCP_MAX_TOOLS"] = answers.maxTools;
+    }
     const config = {
       mcpServers: {
         wordpress: {
           command: "npx",
           args: [PACKAGE_NAME],
-          env: {
-            WP_URL: answers.wpUrl,
-            WP_USERNAME: answers.wpUsername,
-            WP_APP_PASSWORD: answers.wpAppPassword,
-          },
+          env: printEnv,
         },
       },
     };

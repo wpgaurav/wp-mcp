@@ -16,6 +16,8 @@ export interface WpPaginatedResponse<T> {
   totalPages: number;
 }
 
+const REQUEST_TIMEOUT_MS = 30_000;
+
 export class WpClient {
   private readonly baseUrl: string;
   private readonly authHeader: string;
@@ -62,6 +64,7 @@ export class WpClient {
       method,
       headers: fetchHeaders,
       body: fetchBody,
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -107,6 +110,7 @@ export class WpClient {
       method,
       headers: fetchHeaders,
       body: body ? JSON.stringify(body) : undefined,
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -124,6 +128,7 @@ export class WpClient {
     const url = `${this.baseUrl}${path}`;
     const response = await fetch(url, {
       headers: { Authorization: this.authHeader },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
 
     if (!response.ok) {

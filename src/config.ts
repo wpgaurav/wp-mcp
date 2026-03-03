@@ -28,5 +28,13 @@ export function loadConfig(overrides: Partial<WpMcpConfig> = {}): WpMcpConfig {
   if (!config.wpUsername) throw new Error("WP_USERNAME is required");
   if (!config.wpAppPassword) throw new Error("WP_APP_PASSWORD is required");
 
+  if (isNaN(config.port) || config.port < 1 || config.port > 65535) {
+    throw new Error(`Invalid port: ${config.port}. Must be between 1 and 65535.`);
+  }
+
+  if (isNaN(config.maxTools) || config.maxTools < 1) {
+    throw new Error(`Invalid maxTools: ${config.maxTools}. Must be at least 1.`);
+  }
+
   return config;
 }

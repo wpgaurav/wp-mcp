@@ -32,11 +32,13 @@ function mockFetch(response: {
   headers?: Record<string, string>;
 }) {
   const headers = new Map(Object.entries(response.headers ?? {}));
+  const jsonBody = response.json ?? {};
   return vi.fn().mockResolvedValue({
     ok: response.ok ?? true,
     status: response.status ?? 200,
     statusText: "OK",
-    json: () => Promise.resolve(response.json ?? {}),
+    json: () => Promise.resolve(jsonBody),
+    text: () => Promise.resolve(JSON.stringify(jsonBody)),
     headers: { get: (key: string) => headers.get(key) ?? null },
   });
 }

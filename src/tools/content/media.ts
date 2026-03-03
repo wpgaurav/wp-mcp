@@ -79,7 +79,10 @@ export function registerMediaTools(server: McpServer, client: WpClient, registry
         });
 
         if (title || alt_text || caption) {
-          const mediaId = (uploadResult as Record<string, unknown>)["id"] as number;
+          const mediaId = (uploadResult as Record<string, unknown>)["id"];
+          if (typeof mediaId !== "number") {
+            return { content: [{ type: "text" as const, text: "Upload succeeded but response missing media ID. Cannot update metadata." }], isError: true as const };
+          }
           const updateBody: Record<string, unknown> = {};
           if (title) updateBody["title"] = title;
           if (alt_text) updateBody["alt_text"] = alt_text;

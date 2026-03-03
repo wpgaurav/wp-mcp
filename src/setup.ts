@@ -13,10 +13,11 @@ interface SetupAnswers {
   maxTools: string;
 }
 
-function createPrompt(): (question: string) => Promise<string> {
+function createPrompt(): { ask: (question: string) => Promise<string>; close: () => void } {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  return (question: string) =>
+  const ask = (question: string): Promise<string> =>
     new Promise((resolve) => rl.question(question, (answer) => resolve(answer.trim())));
+  return { ask, close: () => rl.close() };
 }
 
 async function ask(prompt: (q: string) => Promise<string>, question: string, defaultValue?: string): Promise<string> {
@@ -97,7 +98,7 @@ function writeToConfig(configPath: string, answers: SetupAnswers): boolean {
 }
 
 export async function runSetup(): Promise<void> {
-  const prompt = createPrompt();
+  const { ask: prompt, close: closePrompt } = createPrompt();
 
   console.log(`
 ┌─────────────────────────────────────┐
@@ -207,5 +208,5 @@ Where do you want to use wp-mcp?
   Done! Restart Claude Desktop/Code to start using WordPress tools.
 `);
 
-  process.exit(0);
+  closePrompt();
 }

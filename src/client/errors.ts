@@ -24,15 +24,21 @@ interface WpErrorBody {
 
 export async function parseWpError(response: Response): Promise<WpApiError> {
   let body: WpErrorBody = {};
+  let rawText = "";
   try {
-    body = (await response.json()) as WpErrorBody;
+    rawText = await response.text();
+    body = JSON.parse(rawText) as WpErrorBody;
   } catch {
-    // non-JSON error response
+    // non-JSON response — use raw text as fallback message
   }
+
+  const message = body.message
+    ?? (rawText.length > 0 && rawText.length < 500 ? rawText : null)
+    ?? response.statusText;
 
   return new WpApiError(
     response.status,
     body.code ?? "unknown_error",
-    body.message ?? response.statusText,
+    message,
   );
 }

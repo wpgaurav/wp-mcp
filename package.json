@@ -1,6 +1,6 @@
 {
   "name": "@wpgaurav/wp-mcp",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "WordPress MCP Server — expose any WordPress site's REST API as MCP tools with auto-discovery of custom plugin endpoints",
   "type": "module",
   "bin": {

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { loadConfig } from "../src/config.js";
-import { createWpMcpServer } from "../src/server.js";
+import { createWpMcpServer, createWpMcpServerFactory } from "../src/server.js";
 import { createStdioTransport } from "../src/transports/stdio.js";
 import { startHttpTransport } from "../src/transports/http.js";
 import { runSetup } from "../src/setup.js";
@@ -71,11 +71,11 @@ async function main() {
     discover: overrides["discover"] === "false" ? false : undefined,
   });
 
-  const { server } = await createWpMcpServer(config);
-
   if (config.transport === "http") {
-    await startHttpTransport(server, config.host, config.port);
+    const factory = await createWpMcpServerFactory(config);
+    await startHttpTransport(factory, config.host, config.port);
   } else {
+    const { server } = await createWpMcpServer(config);
     const transport = createStdioTransport();
     await server.connect(transport);
     console.error("wp-mcp server running on stdio");

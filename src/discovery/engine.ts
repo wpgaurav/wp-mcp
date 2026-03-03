@@ -88,6 +88,65 @@ export async function runDiscovery(
   return count;
 }
 
+export async function runDiscoveryCollect(
+  client: WpClient,
+  maxTools: number = DEFAULT_MAX_DISCOVERED,
+): Promise<DiscoveredRoute[]> {
+  const discovery = await client.fetchRawJson<WpDiscoveryResponse>("/");
+  const routes = discovery.routes ?? {};
+  const collected: DiscoveredRoute[] = [];
+
+  for (const [routePath, routeInfo] of Object.entries(routes)) {
+    if (collected.length >= maxTools) break;
+
+    const namespace = routeInfo.namespace ?? inferNamespace(routePath);
+    if (!namespace || shouldSkipNamespace(namespace)) continue;
+
+    const endpoints = routeInfo.endpoints ?? [];
+    if (endpoints.length === 0 && routeInfo.methods) {
+      for (const method of routeInfo.methods) {
+        if (collected.length >= maxTools) break;
+        if (!shouldDiscoverMethod(method)) continue;
+        collected.push({
+          namespace,
+          path: stripNamespaceFromPath(routePath, namespace),
+          method: method.toUpperCase(),
+          args: {},
+        });
+      }
+      continue;
+    }
+
+    for (const endpoint of endpoints) {
+      if (collected.length >= maxTools) break;
+      for (const method of endpoint.methods) {
+        if (collected.length >= maxTools) break;
+        if (!shouldDiscoverMethod(method)) continue;
+        collected.push({
+          namespace,
+          path: stripNamespaceFromPath(routePath, namespace),
+          method: method.toUpperCase(),
+          args: endpoint.args ?? {},
+        });
+      }
+    }
+  }
+
+  return collected;
+}
+
+export function replayDiscoveredRoutes(
+  server: McpServer,
+  client: WpClient,
+  registry: ToolRegistry,
+  routes: DiscoveredRoute[],
+): void {
+  for (const route of routes) {
+    registerDiscoveredTool(server, client, registry, route);
+  }
+  registerDiscoverRoutesTool(server, client, registry);
+}
+
 function registerDiscoverRoutesTool(server: McpServer, client: WpClient, registry: ToolRegistry): void {
   if (registry.has("wp_discover_routes")) return;
 
